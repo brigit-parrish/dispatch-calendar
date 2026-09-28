@@ -1,0 +1,66 @@
+.event-form-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.event-form {
+  background: #fff;
+  border-radius: 6px;
+  padding: 20px;
+  width: 320px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.event-form h2 {
+  margin-top: 0;
+}
+
+.event-form label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.event-form input,
+.event-form select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.field-error {
+  color: #c0392b;
+  font-size: 12px;
+  margin: -8px 0 12px;
+}
+
+.field-error-banner {
+  font-size: 13px;
+  margin: 0 0 16px;
+}
+
+.event-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.event-form-delete {
+  margin-right: auto;
+}
+
+.event-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
