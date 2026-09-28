@@ -285,7 +285,7 @@ describe("validateEvent - invalid input types", () => {
     { desc: "NaN start", overrides: { start: NaN }, field: "duration" },
     { desc: "NaN end", overrides: { end: NaN }, field: "duration" },
     { desc: "missing group", overrides: { group: undefined }, field: "group" }
-  ])("$desc -> error on '$field'", ({ overrides, field }) => {
+  ])("$desc -> error on $field", ({ overrides, field }) => {
     const errors = validateEvent(baseCandidate(overrides), [], NOW);
     expect(hasField(errors, field)).toBe(true);
   });
