@@ -5,6 +5,8 @@ import Timeline from "react-calendar-timeline";
 
 import generateFakeData from "./generate-fake-data";
 import EventForm from "./EventForm";
+import validateEvent from "./validateEvent";
+import "./CustomTimeline.css";
 
 var keys = {
   groupIdKey: "id",
@@ -21,6 +23,7 @@ var keys = {
 
 const DEFAULT_DURATION = 60 * 60 * 1000;
 const QUARTER_HOUR = 15 * 60 * 1000;
+const DAY = 24 * 60 * 60 * 1000;
 
 function nextValidStart(time) {
   const now = Date.now();
@@ -49,16 +52,27 @@ export default class App extends Component {
       selectedItemId: null,
       formOpen: false,
       formMode: null,
-      formInitialValues: null
+      formInitialValues: null,
+      warning: null,
+      warningToken: 0
     };
+    this.warningCounter = 0;
   }
 
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.warning && this.state.warningToken !== prevState.warningToken) {
+      clearTimeout(this.warningTimeout);
+      this.warningTimeout = setTimeout(this.dismissWarning, 5000);
+    }
+  }
+
   componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
+    clearTimeout(this.warningTimeout);
   }
 
   handleKeyDown = e => {
@@ -81,39 +95,67 @@ export default class App extends Component {
 
   handleItemMove = (itemId, dragTime, newGroupOrder) => {
     const { items, groups } = this.state;
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
 
     const group = groups[newGroupOrder];
-
-    this.setState({
-      items: items.map(item =>
-        item.id === itemId
-          ? Object.assign({}, item, {
-              start: dragTime,
-              end: dragTime + (item.end - item.start),
-              group: group.id
-            })
-          : item
-      )
+    const candidate = Object.assign({}, item, {
+      start: dragTime,
+      end: dragTime + (item.end - item.start),
+      group: group.id
     });
 
-    console.log("Moved", itemId, dragTime, newGroupOrder);
+    const errors = validateEvent(candidate, items, Date.now());
+    if (errors.length > 0) {
+      this.showWarning(errors.slice(0, 2).map(e => e.message).join(" "));
+      return;
+    }
+
+    this.setState(prevState => ({
+      items: prevState.items.map(i => (i.id === itemId ? candidate : i)),
+      warning: null
+    }));
   };
 
   handleItemResize = (itemId, time, edge) => {
     const { items } = this.state;
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
 
-    this.setState({
-      items: items.map(item =>
-        item.id === itemId
-          ? Object.assign({}, item, {
-              start: edge === "left" ? time : item.start,
-              end: edge === "left" ? item.end : time
-            })
-          : item
-      )
+    const candidate = Object.assign({}, item, {
+      start: edge === "left" ? time : item.start,
+      end: edge === "left" ? item.end : time
     });
 
-    console.log("Resized", itemId, time, edge);
+    const errors = validateEvent(candidate, items, Date.now());
+    if (errors.length > 0) {
+      this.showWarning(errors.slice(0, 2).map(e => e.message).join(" "));
+      return;
+    }
+
+    this.setState(prevState => ({
+      items: prevState.items.map(i => (i.id === itemId ? candidate : i)),
+      warning: null
+    }));
+  };
+
+  handleMoveResizeValidator = (action, item, time, resizeEdge) => {
+    if (action === "resize") {
+      if (resizeEdge === "left") {
+        return Math.max(time, item.end - DAY);
+      }
+      return Math.min(time, item.start + DAY);
+    }
+    return time;
+  };
+
+  showWarning = message => {
+    this.warningCounter += 1;
+    this.setState({ warning: message, warningToken: this.warningCounter });
+  };
+
+  dismissWarning = () => {
+    this.setState({ warning: null });
   };
 
   handleCanvasDoubleClick = (groupId, time) => {
@@ -193,11 +235,17 @@ export default class App extends Component {
       defaultTimeEnd,
       formOpen,
       formMode,
-      formInitialValues
+      formInitialValues,
+      warning
     } = this.state;
 
     return (
       <div>
+        {warning && (
+          <div className="validation-warning" onClick={this.dismissWarning}>
+            {warning}
+          </div>
+        )}
         <Timeline
           groups={groups}
           items={items}
@@ -212,6 +260,7 @@ export default class App extends Component {
           defaultTimeEnd={defaultTimeEnd}
           onItemMove={this.handleItemMove}
           onItemResize={this.handleItemResize}
+          moveResizeValidator={this.handleMoveResizeValidator}
           onCanvasDoubleClick={this.handleCanvasDoubleClick}
           onItemDoubleClick={this.handleItemDoubleClick}
           onItemSelect={this.handleItemSelect}
