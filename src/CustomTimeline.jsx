@@ -239,6 +239,17 @@ export default class App extends Component {
       warning
     } = this.state;
 
+    const now = Date.now();
+    const displayItems = items.map(item =>
+      item.start > now
+        ? item
+        : Object.assign({}, item, {
+            canMove: false,
+            canResize: false,
+            className: item.className ? `${item.className} item-locked` : "item-locked"
+          })
+    );
+
     return (
       <div>
         {warning && (
@@ -248,7 +259,7 @@ export default class App extends Component {
         )}
         <Timeline
           groups={groups}
-          items={items}
+          items={displayItems}
           keys={keys}
           fullUpdate
           itemTouchSendsClick={false}
