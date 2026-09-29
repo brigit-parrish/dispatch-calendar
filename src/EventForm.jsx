@@ -147,13 +147,14 @@ export default class EventForm extends Component {
                 type="text"
                 value={this.state.title}
                 onChange={this.handleChange("title")}
+                disabled={locked}
               />
             </label>
             {this.errorFor("title") && <p className="field-error">{this.errorFor("title")}</p>}
 
             <label>
               Driver
-              <select value={this.state.group} onChange={this.handleChange("group")}>
+              <select value={this.state.group} onChange={this.handleChange("group")} disabled={locked}>
                 {groups.map(group => (
                   <option key={group.id} value={group.id}>
                     {group.title} {group.rightTitle}
@@ -169,6 +170,7 @@ export default class EventForm extends Component {
                 type="datetime-local"
                 value={this.state.start}
                 onChange={this.handleChange("start")}
+                disabled={locked}
               />
             </label>
 
@@ -178,6 +180,7 @@ export default class EventForm extends Component {
                 type="datetime-local"
                 value={this.state.end}
                 onChange={this.handleChange("end")}
+                disabled={locked}
               />
             </label>
             {this.errorFor("duration") && (

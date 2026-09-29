@@ -170,9 +170,10 @@ describe("EventForm", () => {
       },
       onDelete
     });
-    const { getByText } = render(<EventForm {...props} />);
+    const { getByText, getByLabelText } = render(<EventForm {...props} />);
     expect(getByText("This event has started and can't be edited.")).toBeTruthy();
     expect(getByText("Save").disabled).toBe(true);
+    expect(getByLabelText("Title").disabled).toBe(true);
     fireEvent.click(getByText("Delete"));
     expect(onDelete).toHaveBeenCalledWith("9");
   });
