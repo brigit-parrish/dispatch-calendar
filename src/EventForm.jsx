@@ -98,6 +98,12 @@ export default class EventForm extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
+    if (!this.state.start || !this.state.end) {
+      this.setState({
+        errors: [{ field: "duration", message: "Start and end are required." }]
+      });
+      return;
+    }
     const candidate = this.buildCandidate();
     const errors = validateEvent(candidate, this.props.items, Date.now());
     if (errors.length > 0) {

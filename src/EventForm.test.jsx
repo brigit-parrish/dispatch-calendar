@@ -68,6 +68,18 @@ describe("EventForm", () => {
     expect(document.activeElement).toBe(getByLabelText("Title"));
   });
 
+  it("shows a specific message instead of a NaN-derived one when a date field is cleared", () => {
+    const onSave = vi.fn();
+    const { getByLabelText, getByText, queryByText } = render(
+      <EventForm {...baseProps({ onSave })} />
+    );
+    fireEvent.change(getByLabelText("Start"), { target: { value: "" } });
+    fireEvent.click(getByText("Save"));
+    expect(getByText("Start and end are required.")).toBeTruthy();
+    expect(queryByText("End must be after start.")).toBeNull();
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
   it("shows a title-length error and does not save when the title is too short", () => {
     const onSave = vi.fn();
     const { getByLabelText, getByText } = render(<EventForm {...baseProps({ onSave })} />);
