@@ -21,7 +21,7 @@ Note: `npm test` sets `TZ` inline, which works on macOS/Linux. On Windows, use `
 - **Edit:** double-click an event.
 - **Delete:** the Delete button in the form, or the Delete key on a selected event (never Backspace, ignored while typing).
 - **Drag and resize:** rejected changes show a red banner that auto-dismisses after 5 seconds. Resizes are capped at 24 hours during the drag.
-- **Locked events:** anything that starts at or before now is faded, can't be dragged or resized, and opens in the form with Save disabled. Delete still works.
+- **Locked events:** anything that starts at or before now is faded, can't be dragged or resized, and opens in the form with every field and Save disabled. Delete and Cancel still work.
 - **Now marker:** a red line at the current time; hovering it shows the exact time. The view re-renders every minute so locks stay current.
 
 ## Rules
@@ -49,8 +49,8 @@ Note: `npm test` sets `TZ` inline, which works on macOS/Linux. On Windows, use `
 ## Testing
 
 - Vitest tests for `validateEvent` (36 tests: title, duration, DST, overlap, past-start, locked-original, combined behavior, invalid input) and the data generator (20 tests: no overlaps, valid titles, start < end, across 20 runs). Tests were written and reviewed before the implementation, in separate commits, so the tests-only commit fails on its own by design.
-- React Testing Library tests for `EventForm` (12 tests): renders correctly in add/edit mode, autofocuses the title, shows title/duration/overlap/locked errors individually and together, trims the title before saving, disables Save (but not Delete) on a locked event, and closes on Escape or an overlay click.
-- Total: 68 (`npm test`).
+- React Testing Library tests for `EventForm` (13 tests): renders correctly in add/edit mode, autofocuses the title, shows title/duration/overlap/locked errors individually and together, shows a specific message (not a NaN-derived one) when a date field is cleared, trims the title before saving, disables every field (not just Save) on a locked event while keeping Delete enabled, and closes on Escape or an overlay click.
+- Total: 69 (`npm test`).
 - The now-marker and lock behavior (`canMove`/`canResize`, the minute re-render) are checked manually only; there's no automated test for them yet.
 - UI flows were also checked by hand in the browser.
 
@@ -88,7 +88,6 @@ About 3 hours on the core (setup, `validateEvent` and its tests, the form, drag/
 - `moment` is aliased to its prebuilt file in `vite.config.js` because moment 2.18's dynamic locale require breaks Vite's dev pre-bundler. Upgrade or replace it.
 - Dependencies are old (`react-calendar-timeline@0.28`, `moment@2.18`, `react@16.6`), so `npm audit` reports vulnerabilities, and the bundle is about 855 kB.
 - Upgrading React is the prerequisite for a UI library such as MUI.
-- Form fields aren't disabled for a locked event (Save is).
-- Clearing a date input shows a misleading message.
 - No end-to-end tests yet (Playwright is the next candidate).
 - `npm test` uses inline `TZ`; use `cross-env` for Windows.
+- Demo data is generated on every page load and nothing persists, so refreshing resets everything.
