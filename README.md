@@ -1,5 +1,7 @@
 # Dispatch Calendar
 
+Live demo: https://dispatch-calendar.vercel.app
+
 A dispatch calendar built on `react-calendar-timeline`. Dispatchers can add, edit, and delete events per driver, with validation enforced everywhere an event can change.
 
 ## Run it
