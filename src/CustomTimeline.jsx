@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import moment from "moment";
 
-import Timeline from "react-calendar-timeline";
+import Timeline, { TimelineMarkers, TodayMarker } from "react-calendar-timeline";
 
 import generateFakeData from "./generate-fake-data";
 import EventForm from "./EventForm";
@@ -54,13 +54,17 @@ export default class App extends Component {
       formMode: null,
       formInitialValues: null,
       warning: null,
-      warningToken: 0
+      warningToken: 0,
+      tick: 0
     };
     this.warningCounter = 0;
   }
 
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
+    this.nowTimer = setInterval(() => {
+      this.setState(prevState => ({ tick: prevState.tick + 1 }));
+    }, 60 * 1000);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -73,6 +77,7 @@ export default class App extends Component {
   componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     clearTimeout(this.warningTimeout);
+    clearInterval(this.nowTimer);
   }
 
   handleKeyDown = e => {
@@ -276,7 +281,11 @@ export default class App extends Component {
           onItemDoubleClick={this.handleItemDoubleClick}
           onItemSelect={this.handleItemSelect}
           onItemDeselect={this.handleItemDeselect}
-        />
+        >
+          <TimelineMarkers>
+            <TodayMarker />
+          </TimelineMarkers>
+        </Timeline>
         {formOpen && (
           <EventForm
             open={formOpen}
