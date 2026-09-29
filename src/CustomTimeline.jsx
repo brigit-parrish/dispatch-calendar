@@ -286,7 +286,32 @@ export default class App extends Component {
           onItemDeselect={this.handleItemDeselect}
         >
           <TimelineMarkers>
-            <TodayMarker />
+            <TodayMarker interval={60 * 1000}>
+              {({ styles, date }) => (
+                <div
+                  style={{
+                    ...styles,
+                    backgroundColor: "transparent",
+                    width: "10px",
+                    marginLeft: "-5px",
+                    pointerEvents: "auto"
+                  }}
+                  title={moment(date).format("h:mm A")}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      bottom: 0,
+                      left: "4px",
+                      width: "2px",
+                      backgroundColor: "red",
+                      pointerEvents: "none"
+                    }}
+                  />
+                </div>
+              )}
+            </TodayMarker>
           </TimelineMarkers>
         </Timeline>
         {formOpen && (
