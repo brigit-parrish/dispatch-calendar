@@ -36,6 +36,9 @@ export default class App extends Component {
     super(props);
 
     const { groups, items } = generateFakeData();
+    groups.sort((a, b) =>
+      `${a.title} ${a.rightTitle}`.localeCompare(`${b.title} ${b.rightTitle}`)
+    );
     const defaultTimeStart = moment()
       .startOf("day")
       .toDate();
