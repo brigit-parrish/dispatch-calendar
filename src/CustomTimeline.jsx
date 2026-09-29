@@ -50,7 +50,6 @@ export default class App extends Component {
     this.state = {
       groups,
       items,
-      visibleGroups: groups,
       defaultTimeStart,
       defaultTimeEnd,
       selectedItemId: null,
@@ -59,8 +58,7 @@ export default class App extends Component {
       formInitialValues: null,
       warning: null,
       warningToken: 0,
-      tick: 0,
-      driverFilter: ""
+      tick: 0
     };
     this.warningCounter = 0;
   }
@@ -103,23 +101,12 @@ export default class App extends Component {
     return String(maxId + 1);
   }
 
-  handleDriverFilterChange = e => {
-    const driverFilter = e.target.value;
-    const needle = driverFilter.trim().toLowerCase();
-    const visibleGroups = !needle
-      ? this.state.groups
-      : this.state.groups.filter(group =>
-          `${group.title} ${group.rightTitle}`.toLowerCase().includes(needle)
-        );
-    this.setState({ driverFilter, visibleGroups });
-  };
-
   handleItemMove = (itemId, dragTime, newGroupOrder) => {
-    const { items, visibleGroups } = this.state;
+    const { items, groups } = this.state;
     const item = items.find(i => i.id === itemId);
     if (!item) return;
 
-    const group = visibleGroups[newGroupOrder];
+    const group = groups[newGroupOrder];
     const candidate = Object.assign({}, item, {
       start: dragTime,
       end: dragTime + (item.end - item.start),
@@ -252,14 +239,12 @@ export default class App extends Component {
     const {
       groups,
       items,
-      visibleGroups,
       defaultTimeStart,
       defaultTimeEnd,
       formOpen,
       formMode,
       formInitialValues,
-      warning,
-      driverFilter
+      warning
     } = this.state;
 
     const now = Date.now();
@@ -280,20 +265,8 @@ export default class App extends Component {
             {warning}
           </div>
         )}
-        <input
-          type="text"
-          className="driver-filter"
-          placeholder="Filter drivers..."
-          value={driverFilter}
-          onChange={this.handleDriverFilterChange}
-        />
-        {driverFilter && (
-          <p className="driver-filter-hint">
-            Clear filter to drag events between drivers.
-          </p>
-        )}
         <Timeline
-          groups={visibleGroups}
+          groups={groups}
           items={displayItems}
           keys={keys}
           fullUpdate
